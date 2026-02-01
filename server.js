@@ -1,32 +1,48 @@
 import express from "express";
 import ytdlp from "youtube-dl-exec";
-import path from "path";
 import fs from "fs";
+import path from "path";
 
 const app = express();
 
 app.get("/download", async (req, res) => {
-  const { url, type } = req.query;
+  try {
+    const { url, type } = req.query;
 
-  const filename = `download_${Date.now()}`;
+    if (!url) {
+      return res.status(400).send("URL required");
+    }
 
-  const outputPath =
-    type === "audio"
-      ? `${filename}.mp3`
-      : `${filename}.mp4`;
-
-  await ytdlp(url, {
-    format:
+    const filename = `temp/download_${Date.now()}`;
+    const outputPath =
       type === "audio"
-        ? "bestaudio"
-        : "bestvideo+bestaudio",
-    mergeOutputFormat: type === "audio" ? "mp3" : "mp4",
-    output: outputPath
-  });
+        ? `${filename}.mp3`
+        : `${filename}.mp4`;
 
-  res.download(outputPath, () => {
-    fs.unlinkSync(outputPath);
-  });
+    if (type === "video") {
+      await ytdlp(url, {
+        format: "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best",
+        mergeOutputFormat: "mp4",
+        output: outputPath
+      });
+    } else {
+      await ytdlp(url, {
+        format: "bestaudio",
+        extractAudio: true,
+        audioFormat: "mp3",
+        output: outputPath
+      });
+    }
+
+    res.download(outputPath, () => {
+      fs.unlinkSync(outputPath);
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Download failed");
+  }
 });
 
-app.listen(3000);
+app.listen(3000, () =>
+  console.log("Server running and ready")
+);
