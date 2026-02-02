@@ -2,8 +2,17 @@ import express from "express";
 import ytdlp from "youtube-dl-exec";
 import fs from "fs";
 import path from "path";
+import ejs from 'ejs'
+import cors from'cors'
 
 const app = express();
+app.use(cors())
+app.set('view-engine','ejs');
+app.set('views','./views');
+
+app.get('/', (req,res)=>{
+  res.render('index.ejs')
+})
 
 app.get("/download", async (req, res) => {
   try {
