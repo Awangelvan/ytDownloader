@@ -1,9 +1,10 @@
 import express from "express";
 import ytdlp from "youtube-dl-exec";
 import fs from "fs";
-import path from "path";
-import ejs from 'ejs'
-import cors from'cors'
+import cors from'cors';
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
 app.use(cors())
@@ -52,6 +53,6 @@ app.get("/download", async (req, res) => {
   }
 });
 
-app.listen(3000, () =>
+app.listen(process.env.PORT, () =>
   console.log("Server running and ready")
 );

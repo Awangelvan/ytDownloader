@@ -1,3 +1,11 @@
-/node_modules
-/temp
---frag2
+node_modules/
+
+temp/
+download/
+
+*.mp4
+*.mp3
+*.webm
+*.m4a
+
+.env
